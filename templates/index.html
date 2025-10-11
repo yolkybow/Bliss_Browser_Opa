@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Portfolio Tracker</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>💼 Finance Portfolio Tracker</h1>
+            <div class="refresh-info">
+                <span id="lastUpdate">Last updated: Never</span>
+                <button class="btn btn-refresh" onclick="refreshAllData()">🔄 Refresh</button>
+            </div>
+        </header>
+
+        <!-- Portfolio Summary -->
+        <div class="summary-section">
+            <h2>Portfolio Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-card total">
+                    <div class="summary-icon">💰</div>
+                    <div class="summary-content">
+                        <div class="summary-label">Total Portfolio Value</div>
+                        <div class="summary-value" id="totalValue">$0.00</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">🏠</div>
+                    <div class="summary-content">
+                        <div class="summary-label">Properties</div>
+                        <div class="summary-value" id="propertyValue">$0.00</div>
+                        <div class="summary-count" id="propertyCount">0 properties</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">🚗</div>
+                    <div class="summary-content">
+                        <div class="summary-label">Vehicles</div>
+                        <div class="summary-value" id="vehicleValue">$0.00</div>
+                        <div class="summary-count" id="vehicleCount">0 vehicles</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">🏦</div>
+                    <div class="summary-content">
+                        <div class="summary-label">Bank Accounts</div>
+                        <div class="summary-value" id="bankBalance">$0.00</div>
+                        <div class="summary-count" id="bankCount">0 accounts</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">₿</div>
+                    <div class="summary-content">
+                        <div class="summary-label">Crypto</div>
+                        <div class="summary-value" id="cryptoValue">$0.00</div>
+                        <div class="summary-count" id="cryptoCount">0 holdings</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">📈</div>
+                    <div class="summary-content">
+                        <div class="summary-label">Stocks</div>
+                        <div class="summary-value" id="stockValue">$0.00</div>
+                        <div class="summary-count" id="stockCount">0 holdings</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('properties')">🏠 Properties</button>
+            <button class="tab" onclick="showTab('vehicles')">🚗 Vehicles</button>
+            <button class="tab" onclick="showTab('bank')">🏦 Bank Accounts</button>
+            <button class="tab" onclick="showTab('crypto')">₿ Crypto (Live)</button>
+            <button class="tab" onclick="showTab('stocks')">📈 Stocks (Live)</button>
+        </div>
+
+        <!-- Properties Tab -->
+        <div id="properties-tab" class="tab-content active">
+            <div class="section-header">
+                <h2>Property Portfolio</h2>
+                <button class="btn btn-primary" onclick="showAddPropertyModal()">+ Add Property</button>
+            </div>
+            <div id="propertiesList" class="card-grid"></div>
+        </div>
+
+        <!-- Vehicles Tab -->
+        <div id="vehicles-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Vehicle Portfolio</h2>
+                <button class="btn btn-primary" onclick="showAddVehicleModal()">+ Add Vehicle</button>
+            </div>
+            <div id="vehiclesList" class="card-grid"></div>
+        </div>
+
+        <!-- Bank Accounts Tab -->
+        <div id="bank-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Bank Accounts</h2>
+                <button class="btn btn-primary" onclick="showAddBankModal()">+ Add Bank Account</button>
+            </div>
+            <div class="info-box">
+                <strong>Note:</strong> Live bank balance integration requires bank API keys (Plaid, etc.). 
+                For now, you can manually update balances. The system is ready for API integration when you have credentials.
+            </div>
+            <div id="bankList" class="card-grid"></div>
+        </div>
+
+        <!-- Crypto Tab -->
+        <div id="crypto-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Cryptocurrency Holdings (Live Tracking)</h2>
+                <button class="btn btn-primary" onclick="showAddCryptoModal()">+ Add Crypto</button>
+            </div>
+            <div class="info-box success">
+                <strong>✓ Live Tracking Active:</strong> Prices update automatically from CoinGecko API
+            </div>
+            <div id="cryptoList" class="table-container"></div>
+        </div>
+
+        <!-- Stocks Tab -->
+        <div id="stocks-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Stock Holdings (Live Tracking)</h2>
+                <button class="btn btn-primary" onclick="showAddStockModal()">+ Add Stock</button>
+            </div>
+            <div class="info-box success">
+                <strong>✓ Live Tracking Active:</strong> Prices update automatically from Yahoo Finance
+            </div>
+            <div id="stocksList" class="table-container"></div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="propertyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('propertyModal')">&times;</span>
+            <h2>Add Property</h2>
+            <form id="propertyForm" onsubmit="addProperty(event)">
+                <input type="text" name="name" placeholder="Property Name *" required>
+                <input type="text" name="property_type" placeholder="Type (House, Apartment, Land, etc.)">
+                <input type="text" name="location" placeholder="Location">
+                <input type="number" step="0.01" name="purchase_price" placeholder="Purchase Price">
+                <input type="number" step="0.01" name="current_value" placeholder="Current Value">
+                <input type="date" name="purchase_date" placeholder="Purchase Date">
+                <textarea name="notes" placeholder="Notes" rows="3"></textarea>
+                <button type="submit" class="btn btn-primary">Add Property</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="vehicleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('vehicleModal')">&times;</span>
+            <h2>Add Vehicle</h2>
+            <form id="vehicleForm" onsubmit="addVehicle(event)">
+                <input type="text" name="name" placeholder="Vehicle Name *" required>
+                <input type="text" name="vehicle_type" placeholder="Type (Car, Motorcycle, Boat, etc.)">
+                <input type="text" name="make" placeholder="Make">
+                <input type="text" name="model" placeholder="Model">
+                <input type="number" name="year" placeholder="Year">
+                <input type="number" step="0.01" name="purchase_price" placeholder="Purchase Price">
+                <input type="number" step="0.01" name="current_value" placeholder="Current Value">
+                <input type="text" name="registration" placeholder="Registration Number">
+                <textarea name="notes" placeholder="Notes" rows="3"></textarea>
+                <button type="submit" class="btn btn-primary">Add Vehicle</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="bankModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('bankModal')">&times;</span>
+            <h2>Add Bank Account</h2>
+            <form id="bankForm" onsubmit="addBankAccount(event)">
+                <input type="text" name="bank_name" placeholder="Bank Name *" required>
+                <input type="text" name="account_type" placeholder="Account Type (Checking, Savings, etc.)">
+                <input type="text" name="account_number" placeholder="Account Number (Last 4 digits)">
+                <input type="number" step="0.01" name="manual_balance" placeholder="Current Balance *" required>
+                <textarea name="notes" placeholder="Notes" rows="3"></textarea>
+                <button type="submit" class="btn btn-primary">Add Account</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="cryptoModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('cryptoModal')">&times;</span>
+            <h2>Add Cryptocurrency</h2>
+            <form id="cryptoForm" onsubmit="addCrypto(event)">
+                <input type="text" name="crypto_id" placeholder="Crypto ID (e.g., bitcoin, ethereum) *" required>
+                <input type="text" name="crypto_symbol" placeholder="Symbol (e.g., BTC, ETH) *" required>
+                <input type="number" step="0.00000001" name="amount" placeholder="Amount *" required>
+                <input type="number" step="0.01" name="purchase_price" placeholder="Purchase Price per Coin">
+                <textarea name="notes" placeholder="Notes" rows="3"></textarea>
+                <div class="info-box">
+                    <small>Common IDs: bitcoin, ethereum, binancecoin, cardano, solana, polkadot, dogecoin, ripple</small>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Crypto</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="stockModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('stockModal')">&times;</span>
+            <h2>Add Stock</h2>
+            <form id="stockForm" onsubmit="addStock(event)">
+                <input type="text" name="ticker" placeholder="Ticker Symbol (e.g., AAPL, GOOGL) *" required>
+                <input type="number" step="0.00001" name="shares" placeholder="Number of Shares *" required>
+                <input type="number" step="0.01" name="purchase_price" placeholder="Purchase Price per Share">
+                <textarea name="notes" placeholder="Notes" rows="3"></textarea>
+                <button type="submit" class="btn btn-primary">Add Stock</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
