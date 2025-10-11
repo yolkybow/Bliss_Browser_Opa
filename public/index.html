@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Portfolio Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root { --bg:#0b1020; --card:#121831; --text:#e6e9f2; --muted:#9aa4c1; --accent:#5ce1e6; --good:#36d399; --bad:#f87272; }
+      * { box-sizing: border-box; }
+      body { margin:0; font-family:'Inter',system-ui,Arial,sans-serif; background: var(--bg); color: var(--text); }
+      header { padding: 24px; border-bottom: 1px solid #1f2643; display:flex; align-items:center; justify-content:space-between; }
+      header h1 { margin:0; font-size: 20px; }
+      .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+      .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+      .card { background: var(--card); border:1px solid #1f2643; border-radius: 12px; padding: 16px; }
+      .col-6 { grid-column: span 6; }
+      .col-12 { grid-column: span 12; }
+      .muted{ color:var(--muted); font-size:12px; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #22294d; font-size:13px; }
+      th { color: var(--muted); font-weight: 600; }
+      .row { display:flex; gap: 8px; align-items:center; }
+      input, select, button { background:#0e1430; border:1px solid #202a57; color:var(--text); border-radius:8px; padding:8px 10px; }
+      button.primary { background: linear-gradient(135deg, #2d6cf3, #5ce1e6); border: none; color:#02102b; font-weight:700; }
+      .totals { display:flex; gap:12px; flex-wrap:wrap; }
+      .pill { background:#0e1430; border:1px solid #263163; border-radius:999px; padding:8px 12px; font-weight:600; }
+      .flex { display:flex; gap:16px; flex-wrap:wrap; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Live Portfolio Tracker</h1>
+      <div class="muted">Auto-refresh every 30s</div>
+    </header>
+    <div class="container">
+      <div class="card col-12">
+        <div class="totals" id="totals"></div>
+      </div>
+
+      <div class="grid">
+        <div class="card col-6">
+          <h3>Stocks</h3>
+          <form id="addStock" class="row">
+            <input name="symbol" placeholder="Symbol (e.g. AAPL)" required />
+            <input name="shares" placeholder="Shares" type="number" step="any" required />
+            <button class="primary" type="submit">Add</button>
+          </form>
+          <table>
+            <thead><tr><th>Symbol</th><th>Shares</th><th>USD</th><th>Value</th><th></th></tr></thead>
+            <tbody id="stocksBody"></tbody>
+          </table>
+        </div>
+
+        <div class="card col-6">
+          <h3>Crypto</h3>
+          <form id="addCrypto" class="row">
+            <input name="coingeckoId" placeholder="CoinGecko ID (e.g. bitcoin)" required />
+            <input name="amount" placeholder="Amount" type="number" step="any" required />
+            <button class="primary" type="submit">Add</button>
+          </form>
+          <table>
+            <thead><tr><th>ID</th><th>Amount</th><th>USD</th><th>Value</th><th></th></tr></thead>
+            <tbody id="cryptoBody"></tbody>
+          </table>
+        </div>
+
+        <div class="card col-6">
+          <h3>Properties</h3>
+          <form id="addProperty" class="row">
+            <input name="name" placeholder="Name" required />
+            <input name="valueUsd" placeholder="Estimated Value (USD)" type="number" step="any" required />
+            <button class="primary" type="submit">Add</button>
+          </form>
+          <table>
+            <thead><tr><th>Name</th><th>Est. Value</th><th></th></tr></thead>
+            <tbody id="propertiesBody"></tbody>
+          </table>
+        </div>
+
+        <div class="card col-6">
+          <h3>Vehicles</h3>
+          <form id="addVehicle" class="row">
+            <input name="name" placeholder="Name" required />
+            <input name="valueUsd" placeholder="Estimated Value (USD)" type="number" step="any" required />
+            <button class="primary" type="submit">Add</button>
+          </form>
+          <table>
+            <thead><tr><th>Name</th><th>Est. Value</th><th></th></tr></thead>
+            <tbody id="vehiclesBody"></tbody>
+          </table>
+        </div>
+
+        <div class="card col-12">
+          <h3>Bank Accounts</h3>
+          <div id="bank"></div>
+          <div class="muted">Configure Plaid in `.env` to enable live balances.</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const api = (p, opts={}) => fetch(p, { headers:{'Content-Type':'application/json'}, ...opts }).then(r=>r.json());
+      const fmt = n => n.toLocaleString(undefined,{style:'currency',currency:'USD'});
+
+      async function refreshTotals(){
+        const data = await api('/api/portfolio');
+        const t = data.totals;
+        document.getElementById('totals').innerHTML = `
+          <div class="pill">Stocks: ${fmt(t.stocksUsd||0)}</div>
+          <div class="pill">Crypto: ${fmt(t.cryptoUsd||0)}</div>
+          <div class="pill">Bank: ${fmt(t.bankUsd||0)}</div>
+          <div class="pill">Properties: ${fmt(t.propertiesUsd||0)}</div>
+          <div class="pill">Vehicles: ${fmt(t.vehiclesUsd||0)}</div>
+          <div class="pill">Net Worth: ${fmt(t.netWorthUsd||0)}</div>
+        `;
+      }
+
+      async function loadStocks(){
+        const [holdings, value] = await Promise.all([
+          api('/api/storage/holdings'),
+          api('/api/stocks/value')
+        ]);
+        const map = {}; (value.breakdown||[]).forEach(b=>map[b.symbol]=b);
+        const rows = (holdings.stocks||[]).map(h=>{
+          const b = map[h.symbol?.toUpperCase()] || { usd:0, valueUsd:0 };
+          return `<tr>
+            <td>${h.symbol?.toUpperCase()||''}</td>
+            <td>${h.shares||0}</td>
+            <td>${fmt(b.usd||0)}</td>
+            <td>${fmt(b.valueUsd||0)}</td>
+            <td><button onclick="delHolding('stocks','${h.id}')">✖</button></td>
+          </tr>`;
+        }).join('');
+        document.getElementById('stocksBody').innerHTML = rows;
+      }
+
+      async function loadCrypto(){
+        const [holdings, value] = await Promise.all([
+          api('/api/storage/holdings'),
+          api('/api/crypto/value')
+        ]);
+        const map = {}; (value.breakdown||[]).forEach(b=>map[b.key]=b);
+        const rows = (holdings.crypto||[]).map(h=>{
+          const key = (h.coingeckoId||h.symbol||'').toLowerCase();
+          const b = map[key] || { usd:0, valueUsd:0 };
+          return `<tr>
+            <td>${key}</td>
+            <td>${h.amount||0}</td>
+            <td>${fmt(b.usd||0)}</td>
+            <td>${fmt(b.valueUsd||0)}</td>
+            <td><button onclick="delHolding('crypto','${h.id}')">✖</button></td>
+          </tr>`;
+        }).join('');
+        document.getElementById('cryptoBody').innerHTML = rows;
+      }
+
+      async function loadProps(){
+        const items = await api('/api/storage/properties');
+        document.getElementById('propertiesBody').innerHTML = items.map(p=>`<tr>
+          <td>${p.name||''}</td>
+          <td>${fmt(p.valueUsd||0)}</td>
+          <td><button onclick="delItem('properties','${p.id}')">✖</button></td>
+        </tr>`).join('');
+      }
+      async function loadVehicles(){
+        const items = await api('/api/storage/vehicles');
+        document.getElementById('vehiclesBody').innerHTML = items.map(p=>`<tr>
+          <td>${p.name||''}</td>
+          <td>${fmt(p.valueUsd||0)}</td>
+          <td><button onclick="delItem('vehicles','${p.id}')">✖</button></td>
+        </tr>`).join('');
+      }
+
+      async function loadBank(){
+        const data = await api('/api/bank/balances');
+        const rows = (data.accounts||[]).map(a=>`<div class="flex">
+          <div><strong>${a.name}</strong> ••••${a.mask||''}</div>
+          <div>Available: ${fmt(a.available ?? a.current ?? 0)}</div>
+          <div class="muted">${a.isoCurrencyCode||'USD'}</div>
+        </div>`).join('') || '<div class="muted">No bank accounts linked.</div>';
+        document.getElementById('bank').innerHTML = rows;
+      }
+
+      // Forms
+      document.getElementById('addStock').addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const f = Object.fromEntries(new FormData(e.target).entries());
+        await api('/api/storage/holdings/stocks', { method:'POST', body: JSON.stringify({ symbol:f.symbol, shares: Number(f.shares) }) });
+        e.target.reset();
+        await Promise.all([loadStocks(), refreshTotals()]);
+      });
+      document.getElementById('addCrypto').addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const f = Object.fromEntries(new FormData(e.target).entries());
+        await api('/api/storage/holdings/crypto', { method:'POST', body: JSON.stringify({ coingeckoId: f.coingeckoId, amount: Number(f.amount) }) });
+        e.target.reset();
+        await Promise.all([loadCrypto(), refreshTotals()]);
+      });
+      document.getElementById('addProperty').addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const f = Object.fromEntries(new FormData(e.target).entries());
+        await api('/api/storage/properties', { method:'POST', body: JSON.stringify({ name:f.name, valueUsd: Number(f.valueUsd) }) });
+        e.target.reset();
+        await Promise.all([loadProps(), refreshTotals()]);
+      });
+      document.getElementById('addVehicle').addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const f = Object.fromEntries(new FormData(e.target).entries());
+        await api('/api/storage/vehicles', { method:'POST', body: JSON.stringify({ name:f.name, valueUsd: Number(f.valueUsd) }) });
+        e.target.reset();
+        await Promise.all([loadVehicles(), refreshTotals()]);
+      });
+
+      // Delete helpers
+      window.delHolding = async (type,id)=>{ await api(`/api/storage/holdings/${type}/${id}`, { method:'DELETE' }); await Promise.all([type==='stocks'?loadStocks():loadCrypto(), refreshTotals()]); };
+      window.delItem = async (type,id)=>{ await api(`/api/storage/${type}/${id}`, { method:'DELETE' }); await Promise.all([type==='properties'?loadProps():loadVehicles(), refreshTotals()]); };
+
+      async function init(){
+        await Promise.all([loadStocks(), loadCrypto(), loadProps(), loadVehicles(), loadBank(), refreshTotals()]);
+        setInterval(()=>{ Promise.all([loadStocks(), loadCrypto(), loadBank(), refreshTotals()]); }, 30000);
+      }
+      init();
+    </script>
+  </body>
+</html>
