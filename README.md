@@ -18,26 +18,39 @@ A comprehensive finance portfolio management system with **real-time tracking** 
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Python 3.8+
-- pip (Python package manager)
+### Run Locally
 
-### Installation
+**Prerequisites**: Python 3.8+ and pip
 
-1. **Install dependencies**:
 ```bash
+# 1. Install dependencies
 pip install -r requirements.txt
-```
 
-2. **Run the application**:
-```bash
+# 2. Run the application
 python app.py
-```
 
-3. **Open your browser**:
-Navigate to `http://localhost:5000`
+# 3. Open browser
+# Navigate to http://localhost:5000
+```
 
 That's it! The application will create the database automatically on first run.
+
+### 🌐 Deploy Online (FREE)
+
+Want to access your portfolio from anywhere? Deploy it online in 5 minutes!
+
+**Easiest Option - Render.com (Recommended)**:
+1. Push code to GitHub
+2. Connect GitHub to Render.com (free account)
+3. Click deploy
+4. Done! Access from anywhere: `https://your-app.onrender.com`
+
+📖 **Detailed Instructions**: See [QUICK_DEPLOY.md](QUICK_DEPLOY.md) or [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
+
+**Deployment files included**:
+- ✅ `Procfile` - Deployment configuration
+- ✅ `gunicorn` - Production server
+- ✅ Environment config - Production-ready settings
 
 ## 📱 Usage Guide
 
