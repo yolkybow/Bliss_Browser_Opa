@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Portfolio Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <div class="container">
+                <h1><i class="fas fa-chart-line"></i> Finance Portfolio Tracker</h1>
+                <div class="portfolio-summary">
+                    <div class="summary-item">
+                        <span class="label">Total Portfolio Value</span>
+                        <span class="value" id="totalValue">$0.00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Last Updated</span>
+                        <span class="value" id="lastUpdated">--</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="nav">
+            <div class="container">
+                <button class="nav-btn active" data-section="overview">
+                    <i class="fas fa-tachometer-alt"></i> Overview
+                </button>
+                <button class="nav-btn" data-section="properties">
+                    <i class="fas fa-home"></i> Properties
+                </button>
+                <button class="nav-btn" data-section="vehicles">
+                    <i class="fas fa-car"></i> Vehicles
+                </button>
+                <button class="nav-btn" data-section="stocks">
+                    <i class="fas fa-chart-bar"></i> Stocks
+                </button>
+                <button class="nav-btn" data-section="crypto">
+                    <i class="fab fa-bitcoin"></i> Crypto
+                </button>
+                <button class="nav-btn" data-section="bank">
+                    <i class="fas fa-university"></i> Bank Accounts
+                </button>
+            </div>
+        </nav>
+
+        <main class="main">
+            <div class="container">
+                <!-- Overview Section -->
+                <section id="overview" class="section active">
+                    <h2>Portfolio Overview</h2>
+                    <div class="overview-grid">
+                        <div class="overview-card">
+                            <div class="card-header">
+                                <h3>Properties</h3>
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="card-value" id="propertiesValue">$0.00</div>
+                        </div>
+                        <div class="overview-card">
+                            <div class="card-header">
+                                <h3>Vehicles</h3>
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="card-value" id="vehiclesValue">$0.00</div>
+                        </div>
+                        <div class="overview-card">
+                            <div class="card-header">
+                                <h3>Stocks</h3>
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="card-value" id="stocksValue">$0.00</div>
+                        </div>
+                        <div class="overview-card">
+                            <div class="card-header">
+                                <h3>Crypto</h3>
+                                <i class="fab fa-bitcoin"></i>
+                            </div>
+                            <div class="card-value" id="cryptoValue">$0.00</div>
+                        </div>
+                        <div class="overview-card">
+                            <div class="card-header">
+                                <h3>Bank Accounts</h3>
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <div class="card-value" id="bankValue">$0.00</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Properties Section -->
+                <section id="properties" class="section">
+                    <div class="section-header">
+                        <h2>Properties</h2>
+                        <button class="btn btn-primary" onclick="openModal('property')">
+                            <i class="fas fa-plus"></i> Add Property
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Address</th>
+                                    <th>Type</th>
+                                    <th>Purchase Price</th>
+                                    <th>Current Value</th>
+                                    <th>Gain/Loss</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="propertiesTable">
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Vehicles Section -->
+                <section id="vehicles" class="section">
+                    <div class="section-header">
+                        <h2>Vehicles</h2>
+                        <button class="btn btn-primary" onclick="openModal('vehicle')">
+                            <i class="fas fa-plus"></i> Add Vehicle
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Make/Model</th>
+                                    <th>Year</th>
+                                    <th>Purchase Price</th>
+                                    <th>Current Value</th>
+                                    <th>Mileage</th>
+                                    <th>Condition</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vehiclesTable">
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Stocks Section -->
+                <section id="stocks" class="section">
+                    <div class="section-header">
+                        <h2>Stocks</h2>
+                        <button class="btn btn-primary" onclick="openModal('stock')">
+                            <i class="fas fa-plus"></i> Add Stock
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Quantity</th>
+                                    <th>Purchase Price</th>
+                                    <th>Current Price</th>
+                                    <th>Current Value</th>
+                                    <th>Gain/Loss</th>
+                                    <th>Gain/Loss %</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stocksTable">
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Crypto Section -->
+                <section id="crypto" class="section">
+                    <div class="section-header">
+                        <h2>Cryptocurrency</h2>
+                        <button class="btn btn-primary" onclick="openModal('crypto')">
+                            <i class="fas fa-plus"></i> Add Crypto
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Quantity</th>
+                                    <th>Purchase Price</th>
+                                    <th>Current Price</th>
+                                    <th>Current Value</th>
+                                    <th>Gain/Loss</th>
+                                    <th>Gain/Loss %</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cryptoTable">
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Bank Accounts Section -->
+                <section id="bank" class="section">
+                    <div class="section-header">
+                        <h2>Bank Accounts</h2>
+                        <button class="btn btn-primary" onclick="openModal('bank')">
+                            <i class="fas fa-plus"></i> Add Account
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Bank Name</th>
+                                    <th>Account Type</th>
+                                    <th>Account Number</th>
+                                    <th>Current Balance</th>
+                                    <th>Last Updated</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bankTable">
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Modal for adding/editing items -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Add Item</h3>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="modalForm">
+                        <!-- Form fields will be populated dynamically -->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveItem()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="bundle.js"></script>
+</body>
+</html>
